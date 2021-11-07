@@ -278,16 +278,18 @@ router.put(
                 description
             }
             
+            // Get the exp_id and finding the proper user
             const expId = req.params.exp_id
             const profile = await Profile.findOne({ user: req.user.id })
             
+            // Get the array index of experience and substitute it for the new one
             const getIndex = profile.experience
                 .map(item => item.id)
                 .indexOf(expId)
             profile.experience.splice(getIndex, 1, updateExp)
 
             await profile.save()
-            
+
             res.json(profile.experience)
         } catch (error) {
             console.error(err.message)
