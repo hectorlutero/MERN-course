@@ -13,19 +13,26 @@ const User = require('../../models/User')
 // @access  Public
 router.post('/', 
     [
-    check('name', 'Name is required')
+    check(
+        'name', 
+        'Name is required')
         .not()
         .isEmpty(),
-    check('email', 'Please enter a valid email address').isEmail(),
+    check(
+        'email', 
+        'Please enter a valid email address')
+        .isEmail(),
     check(
         'password', 
-        'Please enter your password with more than 6 characters'
-        ).isLength({min: 6})
+        'Please enter your password with more than 6 characters')
+        .isLength({min: 6})
     ], 
     async (req, res) => {
         const errors = validationResult(req)
         if(!errors.isEmpty()) {
-            return res.status(400).json({
+            return res
+                    .status(400)
+                    .json({
                 errors: errors.array()
             })
         }

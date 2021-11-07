@@ -14,11 +14,14 @@ const User = require('../../models/User')
 router.get('/', auth, async (req, res) => {
     try {
         const userId = req.user.id
-        const user = await User.findById(userId).select('-password')
+        const user = await User
+                            .findById(userId)
+                            .select('-password')
         res.json(user)
     } catch(err) {
         console.error(err.message)
-        res.status(500).send('Server Error')
+        res .status(500)
+            .send('Server Error')
     }
 })
 
@@ -28,18 +31,19 @@ router.get('/', auth, async (req, res) => {
 
 router.post('/', 
     [
-    check('email', 'Please enter a valid email address').isEmail(),
+    check(  
+        'email', 
+        'Please enter a valid email address').isEmail(),
     check(
         'password', 
-        'Password is required'
-        ).exists()
+        'Password is required').exists()
     ], 
     async (req, res) => {
         const errors = validationResult(req)
         if(!errors.isEmpty()) {
-            return res.status(400).json({
-                errors: errors.array()
-            })
+            return res
+                    .status(400)
+                    .json({ errors: errors.array()})
         }
 
         // See if user exists
@@ -85,7 +89,8 @@ router.post('/',
                 })
         } catch (error) {
             console.error(error.message)
-            res.status(500).send('Server error')
+            res .status(500)
+                .send('Server error')
         } 
 })
 
