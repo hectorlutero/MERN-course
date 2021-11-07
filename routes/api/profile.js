@@ -117,10 +117,6 @@ router.post(
             res.status(500).send('Server Error')
         }
 
-        console.log(profileFields.social)
-
-        res.send('Hello')
-
 })
 
 // @route   GET   api/profile/
@@ -157,6 +153,24 @@ router.get('/user/:user_id', async (req, res) => {
                 msg: 'Profile not found'
             })  
         }
+        res.status(500).send('Server Error')
+    }
+})
+
+// @route   DELETE   api/profile
+// @desc    Delete profile, user & posts
+// @access  Private
+router.delete('/', auth, async (req, res) => {
+    try {
+        // @todo - remove users posts
+
+        // Remove Profile
+        const userId = req.user.id
+        await Profile.findOneAndRemove({ user: userId })
+        await User.findOneAndRemove({ _id: userId })
+        res.json({ msg: 'User removed as well as its posts and profile'})
+    } catch (error) {
+        console.error(err.message)
         res.status(500).send('Server Error')
     }
 })
