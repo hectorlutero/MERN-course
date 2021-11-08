@@ -12,17 +12,14 @@ const User = require('../../models/User')
 router.get('/me', auth, async (req, res) => {
     try {
         const userId = req.user.id
-        const profile = await Profile
-                            .findOne({ user: userId })
-                            .populate('user', ['name', 'avatar'])
+        const profile = await Profile.findOne({ user: userId }).populate('user', ['name', 'avatar'])
 
         if(!profile) {
-            return res 
-                    .status(404)
-                    .json({ msg: 'There\'s no profile for this user'})
+            return res.status(404).json({ msg: 'There\'s no profile for this user' })
         }
-    } catch (err) {
-        console.log(err.message)
+        res.json(profile)
+    } catch (error) {
+        console.log(error.message)
         res
             .status(500)
             .send('Server Error')
@@ -127,7 +124,7 @@ router.get('/', async (req, res) => {
         const profiles = await Profile.find().populate('user', ['name', 'avatar'])
          res.json(profiles)
     } catch (error) {
-        console.error(err.message)
+        console.error(error.message)
         res.status(500).send('Server Error')
     }
 })
@@ -170,7 +167,7 @@ router.delete('/', auth, async (req, res) => {
         await User.findOneAndRemove({ _id: userId })
         res.json({ msg: 'User removed as well as its posts and profile'})
     } catch (error) {
-        console.error(err.message)
+        console.error(error.message)
         res.status(500).send('Server Error')
     }
 })
@@ -292,7 +289,7 @@ router.put(
 
             res.json(profile.experience)
         } catch (error) {
-            console.error(err.message)
+            console.error(error.message)
             res.status(500).send('Server Error')
         }
     })
@@ -305,12 +302,12 @@ router.get(
     '/experience/:exp_id',
     async (req, res) => {
         try {
-
             const expId = req.params.exp_id
-            await Profile.findOne({ experience: expId })
-            console.log(expId)
+            const profile = await Profile.findOne({ experience: expId })
+
+            res.json(profile)
         } catch (error) {
-            console.error(err.message)
+            console.error(error.message)
             res.status(500).send('Server Error')
         }
     })
@@ -332,6 +329,173 @@ router.delete(
                 .indexOf(expId)
 
             profile.experience.splice(removeIndex, 1)
+
+            await profile.save()
+
+            res.json(profile)
+        } catch (error) {
+            console.error(error.message)
+            res.status(500).send('Server Error')
+        }
+    })
+
+// @route   PUT   api/profile/education
+// @desc    Add profile education
+// @access  Private
+router.put(
+    '/education', 
+    [
+        auth, 
+        [
+            check('school', 'School is required')
+            .not()
+            .isEmpty(),
+            check('degree', 'Degree is required')
+            .not()
+            .isEmpty(),
+            check('fieldofstudy', 'Field of study is required')
+            .not()
+            .isEmpty(),
+        ]
+    ], async (req, res) => {
+        const errors = validationResult(req)
+        if(!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        const {
+            school,
+            degree,
+            fieldofstudy,
+            from,
+            to,
+            current,
+            description
+        } = req.body
+
+        const newExp = {
+            school,
+            degree,
+            fieldofstudy,
+            from,
+            to,
+            current,
+            description
+        }
+
+        try {
+            const profile = await Profile.findOne({ user: req.user.id })
+
+            profile.education.unshift(newExp)
+            await profile.save()
+
+            res.json(profile)
+        } catch (error) {
+            console.error(error.message)
+            res.status(500).send('Server Error')
+        }
+})
+
+// @route   PUT   api/profile/education/:edu_id
+// @desc    Update profile education
+// @access  Private
+router.put(
+    '/education/:edu_id',
+    [
+        auth, 
+        [
+            check('school', 'School is required')
+            .not()
+            .isEmpty(),
+            check('degree', 'Degree is required')
+            .not()
+            .isEmpty(),
+            check('fieldofstudy', 'Field of study is required')
+            .not()
+            .isEmpty(),
+        ]
+    ],
+    async (req, res) => {
+        try {
+            const errors = validationResult(req)
+            if(!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
+
+            const {
+                school,
+                degree,
+                fieldofstudy,
+                from,
+                to,
+                current,
+                description
+            } = req.body
+    
+            const updateEdu = {
+                school,
+                degree,
+                fieldofstudy,
+                from,
+                to,
+                current,
+                description
+            }
+            
+            // Get the edu_id and finding the proper user
+            const eduId = req.params.edu_id
+            const profile = await Profile.findOne({ user: req.user.id })
+            
+            // Get the array index of education and substitute it for the new one
+            const getIndex = profile.education
+                .map(item => item.id)
+                .indexOf(eduId)
+            profile.education.splice(getIndex, 1, updateEdu)
+
+            await profile.save()
+
+            res.json(profile.education)
+        } catch (error) {
+            console.error(err.message)
+            res.status(500).send('Server Error')
+        }
+    })
+
+
+// @route   GET   api/profile/education/:edu_id
+// @desc    Remove profile education
+// @access  Private
+router.get(
+    '/education/:edu_id',
+    async (req, res) => {
+        try {
+            const eduId = req.params.edu_id
+            const profile = await Profile.findOne({ education: eduId })
+
+            res.json(profile.education)
+        } catch (error) {
+            console.error(error.message)
+            res.status(500).send('Server Error')
+        }
+    })
+
+// @route   DELETE api/profile/education/:edu_id
+// @desc    Delete profile education
+// @access  Private
+router.delete(
+    '/education/:edu_id', auth,
+    async (req, res) => {
+        try {
+
+            const eduId = req.params.edu_id
+            const profile = await Profile.findOne({ user: req.user.id })
+
+            // Get remove index
+            const removeIndex = profile.education
+                .map(item => item.id)
+                .indexOf(eduId)
+
+            profile.education.splice(removeIndex, 1)
 
             await profile.save()
 
