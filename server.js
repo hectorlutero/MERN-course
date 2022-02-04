@@ -7,7 +7,7 @@ connectDB()
 // INIT MIDDLEWARE
 app.use(express.json({ extended: false }))
 
-app.get('/', (req, res) => res.send('API Running'))
+app.get('/', (req, res) => res.send('API Runningaaaa'))
 
 
 app.use('/api/users', require('./routes/api/users'))
