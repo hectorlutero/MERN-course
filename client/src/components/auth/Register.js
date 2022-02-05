@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from "react";
+import axios from "axios";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,12 +14,32 @@ export const Register = () => {
   const onChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault();
     if (password !== password2) {
       console.log("passowords do not match");
     } else {
-      console.log(formData);
+      const newUser = {
+        name,
+        email,
+        password,
+        password2,
+      };
+      try {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        };
+
+        const body = JSON.stringify(newUser);
+
+        // That's the reason we use the "proxy:" on package.json to not type down http://localhost:5000 every goddamn time
+        const res = await axios.post("/api/users", body, config);
+        console.log(res.data);
+      } catch (err) {
+        console.error(err.response.data);
+      }
     }
   };
 
