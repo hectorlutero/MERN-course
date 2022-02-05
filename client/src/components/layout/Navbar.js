@@ -2,10 +2,10 @@ import React from "react";
 
 export const Navbar = () => {
   return (
-    <nav class="navbar bg-dark">
+    <nav className="navbar bg-dark">
       <h1>
         <a href="index.html">
-          <i class="fas fa-code"></i> DevConnector
+          <i className="fas fa-code"></i> DevConnector
         </a>
       </h1>
       <ul>
