@@ -1,0 +1,4 @@
+{
+    "<mongoURI>": "mongodb+srv://<username>:<password>@devconnector.snjfr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "<jwtSecret>": "whateveryouwant"
+}
