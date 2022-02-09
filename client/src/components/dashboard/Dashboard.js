@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Spinner from "../layout/Spinner";
@@ -22,10 +23,18 @@ const Dashboard = ({
         <i className="fas fa-user"></i>
         <span> </span> Welcome {user && user.name}
       </p>
-      {profile.status !== 404 ? (
+      {profile !== null ? (
         <Fragment>has profile</Fragment>
       ) : (
-        <Fragment>has not a profile</Fragment>
+        <Fragment>
+          <p>
+            You don't have a profile yet, well, not a problem at all, here's
+            where you may begin to create yours!{" "}
+          </p>
+          <Link to="/create-profile" className="btn btn-primary my-1">
+            Create Profile
+          </Link>
+        </Fragment>
       )}
     </Fragment>
   );

@@ -1,4 +1,4 @@
-import { GET_PROFILE, PROFILE_ERROR } from "../actions/types";
+import { GET_PROFILE, PROFILE_ERROR, CLEAR_PROFILE } from "../actions/types";
 
 /* eslint-disable import/no-anonymous-default-export */
 /* eslint-disable default-case */
@@ -17,13 +17,20 @@ export default function (state = initialState, action) {
       return {
         ...state,
         profile: payload,
-        laoding: true,
+        laoding: false,
       };
     case PROFILE_ERROR:
       return {
         ...state,
         profile: payload,
         laoding: false,
+      };
+    case CLEAR_PROFILE:
+      return {
+        ...state,
+        profile: null,
+        repos: [],
+        loading: false,
       };
     default:
       return state;
